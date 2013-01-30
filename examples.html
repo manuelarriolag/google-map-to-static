@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Example of converting Google Maps to Static Maps</title>
+	<script type="text/javascript" src="GMapToStatic.js"></script>
+
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false&libraries=places"></script>
+	
+	<style type="text/css">
+		.test{display:table}
+		.test>div{display:table-cell; padding:10px;}
+	</style>
+</head>
+<body>
+
+<h1>Example of converting dynamic google maps to static google maps</h1>
+
+<p>
+This is an example of how converter works. You can convert dynamic <a href="https://developers.google.com/maps/">Google Maps</a> 
+to <a href="https://developers.google.com/maps/documentation/imageapis/">Static (image) Google Maps</a>.
+</p>
+
+<div class="test">
+	<div class="google-map">
+		<h2>Dynamic google map</h2>
+		<div style="width:500px; height:300px" id="DynamicMap"></div>
+	</div>
+	<div class="static-map">
+		<h2>Static (image) google map</h2>
+		<img id="StaticMap" src="" />
+	</div>
+</div>
+	
+
+<script type="text/javascript">
+console.debug('start')
+
+var dynamicMap = document.getElementById('DynamicMap');
+var staticMap = document.getElementById('StaticMap');
+
+/* 
+Build simple google map 
+*/
+var gmap = new google.maps.Map(dynamicMap, {
+	center: new google.maps.LatLng(40.660516, -73.9),
+	zoom:10,
+	zoomControl:true,
+	mapTypeId: google.maps.MapTypeId.ROADMAP
+});
+
+/* 
+Add some markers to map 
+*/
+var marker1 = new google.maps.Marker({
+	map: gmap,
+	position: new google.maps.LatLng(40.67, -73.87)
+});
+var marker2 = new google.maps.Marker({
+	map: gmap,
+	position: new google.maps.LatLng(40.64, -73.93)
+});
+var marker3 = new google.maps.Marker({
+	map: gmap,
+	position: new google.maps.LatLng(40.69, -73.88)
+});
+
+/* 
+add some directions to map (route from ... to)
+*/
+var direrctions = new google.maps.DirectionsService();
+var renderer = new google.maps.DirectionsRenderer({
+	map: gmap,
+	polylineOptions:{
+		strokeColor: '#ff0000'
+	}
+});
+
+direrctions.route(
+	{
+		origin: new google.maps.LatLng(40.75, -72.8),
+		destination: new google.maps.LatLng(32.7, -85.1),
+		travelMode: google.maps.DirectionsTravelMode.DRIVING
+	},
+	function(results, status){
+		if (status == google.maps.DirectionsStatus.OK) {
+			renderer.setDirections(results);
+		}
+	}
+);
+
+
+function updateStaticMap(){
+	var st = new GMapToStatic(gmap);
+
+	// test markers converting
+	st.markers.addGoogleMarker(marker1);
+	st.markers.addGoogleMarker(marker2);
+	st.markers.addGoogleMarker(marker3);
+	
+	// render route based on Google Maps 
+	st.route.setRenderer(renderer);
+
+	//generate source
+	st.event.addListener('onurlprepared', function(url){
+		staticMap.src = url;
+	});
+
+	st.prepareUrl();
+}
+
+google.maps.event.addListener(gmap, 'idle', function(){
+	updateStaticMap();
+})
+
+</script>
+<a href="#" onclick="updateStaticMap(); return false;">update map (if auto not working)</a>
+
+
+
+</body>
+</html>

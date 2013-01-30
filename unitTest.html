@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<script type="text/javascript" src="GMapToStatic.js"></script>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false&libraries=places"></script>
+	<script src="http://yui.yahooapis.com/3.4.1/build/yui/yui-min.js"></script>
+</head>
+<body>
+	<div style="display:none;">
+	<div id="map1" style="width:471px; height:589px; "></div>
+	<div id="map2" style="width:2100px; height:2100px;"></div>
+	</div>
+	
+<script type="text/javascript">
+YUI().use('test', function (Y) {
+    var testCase = new Y.Test.Case({
+
+		name: "Testing Latitude-Longitude encoding",
+
+		setUp : function(){
+			this.map1 = new google.maps.Map(document.getElementById('map1'));
+			this.map2 = new google.maps.Map(document.getElementById('map2'));
+
+			this.staticMap = new GMapToStatic(this.map1);
+			this.latLngEncoder = this.staticMap.latLngEncoder;
+		},
+
+		//------------------------------------------
+		// Tests
+		//------------------------------------------
+		
+		testSingleValueEncoding : function () {
+			Y.Assert.areEqual('`~oia@', this.latLngEncoder.encodeValue(-179.9832104));
+			Y.Assert.areEqual('~ps|U', this.latLngEncoder.encodeValue(-120.2));
+			Y.Assert.areEqual('nnqC', this.latLngEncoder.encodeValue(-0.75));
+			Y.Assert.areEqual('vxq`@', this.latLngEncoder.encodeValue(-5.503));
+			Y.Assert.areEqual('_p~iF', this.latLngEncoder.encodeValue(38.5));
+			Y.Assert.areEqual('_ulL', this.latLngEncoder.encodeValue(2.2));
+			Y.Assert.areEqual('_mqN', this.latLngEncoder.encodeValue(2.552));
+		},
+
+		testLatLngEncoding : function () {
+			Y.Assert.areEqual('_p~iF~ps|U', this.latLngEncoder.encodeLatLng(38.5, -120.2));
+			Y.Assert.areEqual('_ulLnnqC', this.latLngEncoder.encodeLatLng(2.2, -0.75));
+			Y.Assert.areEqual('_mqNvxq`@', this.latLngEncoder.encodeLatLng(2.552, -5.503));
+		},
+
+		testMapSizes : function(){
+			Y.Assert.areEqual('471x589', this.staticMap._mapSizeToStr(this.map1, false));
+			Y.Assert.areEqual('471x589', this.staticMap._mapSizeToStr(this.map1, true));
+			Y.Assert.areEqual('640x640', this.staticMap._mapSizeToStr(this.map2, false));
+			Y.Assert.areEqual('2048x2048', this.staticMap._mapSizeToStr(this.map2, true));
+		}
+	});
+
+	Y.Test.Runner.add(testCase);
+	Y.Test.Runner.run();
+});
+</script>
+
+</body>
+</html>
