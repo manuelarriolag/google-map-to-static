@@ -101,10 +101,7 @@ function updateStaticMap(){
 	// render route based on Google Maps 
 	st.route.setRenderer(renderer);
 
-	/*
-		* generate source
-		* Have to be in callback because some actions generating map are asynchronous
-		*/
+	//generate source
 	st.event.addListener('onurlprepared', function(url){
 		staticMap.src = url;
 	});
